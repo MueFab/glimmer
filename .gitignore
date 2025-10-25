@@ -1,0 +1,47 @@
+# C++/CMake build artifacts
+/build/
+/cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+Testing/
+compile_commands.json
+
+# Object and library files
+*.o
+*.obj
+*.lo
+*.la
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+
+# Coverage and sanitizer outputs
+*.gcno
+*.gcda
+*.profraw
+*.profdata
+
+# IDE/editor configs
+.idea/
+.vscode/
+*.code-workspace
+
+# OS/system files
+.DS_Store
+Thumbs.db
+
+# Logs and caches
+*.log
+*.cache/
+
+# Generated images/outputs
+*.ppm
+render.ppm

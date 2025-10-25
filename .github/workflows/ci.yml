@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ '**' ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (Clang, LLVM tools, CMake, Ninja)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-18 clang-tools-18 llvm-18-tools cmake ninja-build
+
+      - name: Cache CMake build
+        uses: actions/cache@v4
+        with:
+          path: |
+            build
+            ~/.cache/clang
+          key: ${{ runner.os }}-clang18-cmake-${{ hashFiles('CMakeLists.txt', 'src/glimmer/**/*.ixx', 'src/tests/**/*.cpp') }}
+          restore-keys: |
+            ${{ runner.os }}-clang18-cmake-
+
+      - name: Configure (Clang 18 + Ninja)
+        env:
+          CC: clang-18
+          CXX: clang++-18
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_C_COMPILER=clang-18 -DCMAKE_CXX_COMPILER=clang++-18 -DCMAKE_BUILD_TYPE=Debug
+
+      - name: Build all targets
+        run: cmake --build build --parallel
+
+      - name: Run tests (CTest)
+        working-directory: build
+        run: ctest -V --output-on-failure
+
+      - name: Upload ctest logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ctest-logs
+          path: |
+            build/Testing/Temporary/LastTest.log
+            build/Testing/**/Test.xml
+
+      - name: Run demo and upload image
+        run: |
+          cmake --build build --target glimmer
+          ./build/glimmer || true
+        shell: bash
+
+      - name: Upload render artifact (if present)
+        uses: actions/upload-artifact@v4
+        with:
+          name: render-ppm
+          path: render.ppm
+          if-no-files-found: ignore
