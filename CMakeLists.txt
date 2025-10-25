@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.0)
+cmake_minimum_required(VERSION 3.29)
 
 # Try to locate clang-scan-deps early so CMake wires it into the toolchain
 find_program(CLANG_SCAN_DEPS_EXECUTABLE
