@@ -21,18 +21,18 @@ jobs:
       - name: Install LLVM/Clang 19
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget lsb-release gnupg
+          sudo apt-get install -y wget lsb-release gnupg ninja-build
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh 19
           sudo apt-get install -y clang-tools-19 llvm-19-tools lld-19
 
-      - name: Configure CMake
+      - name: Configure CMake (Ninja generator)
         env:
           CC: clang-19
           CXX: clang++-19
         run: |
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang-19 -DCMAKE_CXX_COMPILER=clang++-19
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang-19 -DCMAKE_CXX_COMPILER=clang++-19
 
       - name: Build
         run: cmake --build build --parallel
