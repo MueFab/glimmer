@@ -1,12 +1,14 @@
 import glimmer.scene;
 import glimmer.scene_object;
 import glimmer.sphere;
+import glimmer.plane;
 import glimmer.camera;
 import glimmer.transform;
 import glimmer.vector;
 import glimmer.color;
 import glimmer.image;
 import glimmer.material;
+import glimmer.material_property.checkerboard;
 import glimmer.renderer;
 import glimmer.renderer_simple_rt;
 import glimmer.ppm;
@@ -40,19 +42,41 @@ int main() {
     Scene<T> scene{cam, Vector<T,3>{0.1, 0.2, 0.4}};
 
     // Create two spheres with different materials
-    auto geom = std::make_shared<Sphere<T>>(Vector<T,3>{0,0,0}, 1.0);
-    auto red_diffuse = Material<T>::lambertian(Vector<T,3>{0.9, 0.1, 0.1});
-    auto green_metal = Material<T>::metal(Vector<T,3>{0.1, 0.9, 0.1}, 0.1);
+    auto sphereGeom = std::make_shared<Sphere<T>>(Vector<T, 3>{0, 0, 0}, 1.0);
+
+    // Solid colored sphere (diffuse)
+    auto solid_mat = Material<T>::lambertian(Vector<T, 3>{0.9, 0.2, 0.2}); // red-ish
+
+    // Glass sphere (slightly tinted)
+    auto glass_mat = Material<T>::glass(Vector<T, 3>{0.95, 0.95, 1.0}, /*roughness*/0.01, /*transparency*/0.95);
 
     // Place spheres to the left and right
     auto xf_left  = Transform<T>::from_trs(Vector<T,3>{-1.25, 0.0, 0.0}, glimmer::Quaternion<T>{}, Vector<T,3>{1,1,1});
-    auto xf_right = Transform<T>::from_trs(Vector<T,3>{ 1.25, 0.0, 0.0}, glimmer::Quaternion<T>{}, Vector<T,3>{1,1,1});
+    auto xf_right = Transform<T>::from_trs(Vector<T,3>{ 1.25, 0.0, 0.0}, glimmer::Quaternion<T>{}, Vector<T,3>{1,1, 1});
 
-    SceneObject<T> left{geom, red_diffuse, xf_left};
-    SceneObject<T> right{geom, green_metal, xf_right};
+    SceneObject<T> left{sphereGeom, solid_mat, xf_left};
+    SceneObject<T> right{sphereGeom, glass_mat, xf_right};
 
+    // Add an infinite checkerboard plane at y = -1 facing up
+    using glimmer::Plane;
+    auto planeGeom = std::make_shared<Plane<T>>(Vector<T, 3>{0, -1, 0}, Vector<T, 3>{0, 1, 0});
+
+    // Build a checkerboard property for the plane's albedo
+    Vector<T, 3> white{1, 1, 1};
+    Vector<T, 3> black{0.05, 0.05, 0.05};
+    auto checker = std::make_shared<glimmer::CheckerboardMaterialProperty<T, 3>>(
+        white, black, /*tiles_u*/6, /*tiles_v*/6);
+
+    Material<T> plane_mat = Material<T>::lambertian(white);
+    plane_mat.set_albedo_property(checker);
+
+    glimmer::Transform<T> xf_plane; // identity
+    SceneObject<T> ground{planeGeom, plane_mat, xf_plane};
+
+    // Add objects to the scene
     scene.add_object(left);
     scene.add_object(right);
+    scene.add_object(ground);
 
     // Render
     Image<T,3> img{width, height};

@@ -34,9 +34,14 @@ target_sources(glimmer_vector
             src/glimmer/ray.ixx
             src/glimmer/sphere.ixx
             src/glimmer/mesh.ixx
+        src/glimmer/plane.ixx
             src/glimmer/color.ixx
             src/glimmer/image.ixx
             src/glimmer/aabb.ixx
+        src/glimmer/material_property.ixx
+        src/glimmer/material_property_uniform.ixx
+        src/glimmer/material_property_image.ixx
+        src/glimmer/material_property_checkerboard.ixx
             src/glimmer/material.ixx
             src/glimmer/geometry.ixx
             src/glimmer/scene_object.ixx
