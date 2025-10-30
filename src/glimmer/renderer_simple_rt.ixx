@@ -37,6 +37,7 @@ namespace glimmer {
             // Iterate objects and track closest hit
             T best_t = ray.tmax();
             Vector<T,3> best_n{};
+            Vector<T, 2> best_uv{};
             const Material<T>* best_m = nullptr;
             bool any_hit = false;
             for (const auto& obj : scene.objects()) {
@@ -49,6 +50,7 @@ namespace glimmer {
                         any_hit = true;
                         best_t = h->t;
                         best_n = h->normal;
+                        best_uv = h->uv;
                         best_m = &obj.material();
                     }
                 }
@@ -57,8 +59,9 @@ namespace glimmer {
             // Simple shading
             const Vector<T,3> L = Vector<T,3>{ T{1}, T{1}, T{1} }.normalized();
             const T ndotl = std::max<T>(T{0}, dot(best_n.normalized(), L));
-            Color3 emission = (best_m ? best_m->radiance() * best_m->emission() : Color3::zeros());
-            Color3 diffuse = (best_m ? best_m->albedo() * ndotl : Color3::zeros());
+            const auto uv = best_uv;
+            Color3 emission = (best_m ? best_m->radiance(uv) * best_m->emission(uv) : Color3::zeros());
+            Color3 diffuse = (best_m ? best_m->albedo(uv) * ndotl : Color3::zeros());
             return emission + diffuse;
         }
 

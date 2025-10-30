@@ -66,6 +66,46 @@ namespace glimmer
             h.t = t;
             // Keep stored normal orientation (do not flip with respect to ray)
             h.normal = n_;
+            // Compute UV in plane-local coordinates.
+            // Build orthonormal basis (u_dir, v_dir, n_)
+            Vector<T, 3> ref{T{0}, T{0}, T{1}};
+            if (std::abs(static_cast<double>(n_[2])) > 0.999)
+            {
+                ref = Vector<T, 3>{T{0}, T{1}, T{0}};
+            }
+            Vector<T, 3> u_dir = cross(n_, ref);
+            T ulen = u_dir.norm();
+            if (ulen != T{0})
+            {
+                if constexpr (std::is_floating_point_v<T>) u_dir = u_dir / ulen;
+                else
+                    u_dir = Vector<T, 3>{
+                        static_cast<T>(u_dir[0] / ulen), static_cast<T>(u_dir[1] / ulen),
+                        static_cast<T>(u_dir[2] / ulen)
+                    };
+            }
+            else
+            {
+                // Fallback: pick arbitrary axis
+                u_dir = Vector<T, 3>{T{1}, T{0}, T{0}};
+            }
+            Vector<T, 3> v_dir = cross(n_, u_dir);
+            T vlen = v_dir.norm();
+            if (vlen != T{0})
+            {
+                if constexpr (std::is_floating_point_v<T>) v_dir = v_dir / vlen;
+                else
+                    v_dir = Vector<T, 3>{
+                        static_cast<T>(v_dir[0] / vlen), static_cast<T>(v_dir[1] / vlen), static_cast<T>(v_dir[2] /
+                            vlen)
+                    };
+            }
+            // Intersection point
+            const Vector<T, 3> p = ray.at(t);
+            const Vector<T, 3> d = p - p0_;
+            const T u = dot(d, u_dir);
+            const T v = dot(d, v_dir);
+            h.uv = Vector<T, 2>{u, v};
             return h;
         }
 

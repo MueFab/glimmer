@@ -25,7 +25,12 @@ namespace glimmer {
     public:
         using value_type = T;
         /** @brief Minimal hit record returned by Geometry::intersect. */
-        struct Hit { T t{}; Vector<T,3> normal{}; };
+        struct Hit
+        {
+            T t{};
+            Vector<T, 3> normal{};
+            Vector<T, 2> uv{};
+        };
 
         virtual ~Geometry() = default;
         /** @brief Axis-aligned bounding box in object space. */

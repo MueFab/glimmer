@@ -132,7 +132,11 @@ namespace glimmer {
             const Vector<T,3> p_world{ p4_w[0], p4_w[1], p4_w[2] };
             const Vector<T,3> n_world = normal_it3_ * local_hit.normal;
             const T t_world = compute_world_t_(ray_w, p_world);
-            return typename Geometry<T>::Hit{ t_world, n_world };
+            typename Geometry<T>::Hit wh{};
+            wh.t = t_world;
+            wh.normal = n_world;
+            wh.uv = local_hit.uv; // UVs are defined in object space and remain the same under rigid transforms
+            return wh;
         }
 
         // Cache matrices to avoid recomputing in hot paths
