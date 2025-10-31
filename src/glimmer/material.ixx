@@ -76,7 +76,8 @@ namespace glimmer {
         {
             Material m;
             m.albedo_ = std::make_shared<UniformMaterialProperty<T, Color3>>(albedo);
-            m.roughness_ = std::make_shared<UniformMaterialProperty<T, T>>(T{0});
+            // Purely diffuse: set roughness to 1 so opaque surfaces don't reflect specularly
+            m.roughness_ = std::make_shared<UniformMaterialProperty<T, T>>(T{1});
             m.radiance_ = std::make_shared<UniformMaterialProperty<T, Color3>>(Color3{T{0}, T{0}, T{0}});
             m.transparency_ = std::make_shared<UniformMaterialProperty<T, T>>(T{0});
             m.emission_ = std::make_shared<UniformMaterialProperty<T, T>>(T{0});
@@ -129,7 +130,7 @@ namespace glimmer {
             m.transparency_ = std::make_shared<UniformMaterialProperty<T, T>>(clamp01(transparency));
             m.radiance_ = std::make_shared<UniformMaterialProperty<T, Color3>>(radiance);
             m.emission_ = std::make_shared<UniformMaterialProperty<T, T>>(T{0});
-            m.refractive_index_ = std::make_shared<UniformMaterialProperty<T, T>>(T{1.5});
+            m.refractive_index_ = std::make_shared<UniformMaterialProperty<T, T>>(T{2.0});
             return m;
         }
 
@@ -142,7 +143,7 @@ namespace glimmer {
             m.transparency_ = std::make_shared<UniformMaterialProperty<T, T>>(clamp01(transparency));
             m.radiance_ = std::make_shared<UniformMaterialProperty<T, Color3>>(radiance);
             m.emission_ = std::make_shared<UniformMaterialProperty<T, T>>(clamp_nonneg(power));
-            m.refractive_index_ = std::make_shared<UniformMaterialProperty<T, T>>(T{1.5});
+            m.refractive_index_ = std::make_shared<UniformMaterialProperty<T, T>>(T{2.0});
             return m;
         }
 

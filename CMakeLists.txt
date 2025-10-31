@@ -50,6 +50,7 @@ target_sources(glimmer_vector
             src/glimmer/scene.ixx
             src/glimmer/renderer.ixx
             src/glimmer/renderer_simple_rt.ixx
+        src/glimmer/renderer_path_tracer.ixx
             src/glimmer/obj.ixx
 )
 
